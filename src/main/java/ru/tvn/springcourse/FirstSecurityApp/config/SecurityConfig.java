@@ -52,8 +52,11 @@ public class SecurityConfig {
 
 
         http.authorizeHttpRequests((authorizeHttpRequests) ->
-                authorizeHttpRequests.requestMatchers("/auth/login","/error","/auth/registration").permitAll()
-                        .anyRequest().authenticated());
+                authorizeHttpRequests
+                        .requestMatchers("/admin").hasAnyRole("ADMIN")
+                        .requestMatchers("/auth/login","/error","/auth/registration").permitAll()
+                        .anyRequest().hasAnyRole("USER","ADMIN")
+        );
 
         http.logout((logout) ->
                 logout
