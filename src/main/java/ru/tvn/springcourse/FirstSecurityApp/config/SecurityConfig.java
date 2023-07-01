@@ -3,16 +3,12 @@ package ru.tvn.springcourse.FirstSecurityApp.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -21,19 +17,26 @@ public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
 
+    @Autowired
     public SecurityConfig(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
 
-    @Autowired
-    private void configureManagerBuilder(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService);
+
+
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider(){
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+        daoAuthenticationProvider.setPasswordEncoder(getPasswordEncoder());
+        daoAuthenticationProvider.setUserDetailsService(userDetailsService);
+        return daoAuthenticationProvider;
     }
 
     @Bean
     public PasswordEncoder getPasswordEncoder(){
-        return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
     }
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -60,5 +63,7 @@ public class SecurityConfig {
         );
         return http.build();
     }
+
+
 
 }
