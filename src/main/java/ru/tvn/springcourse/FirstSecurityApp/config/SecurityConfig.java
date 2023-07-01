@@ -47,10 +47,17 @@ public class SecurityConfig {
                         .failureUrl("/auth/login?error")
         );
 
+
         http.authorizeHttpRequests((authorizeHttpRequests) ->
                 authorizeHttpRequests.requestMatchers("/auth/login","/error","/auth/registration").permitAll()
                         .anyRequest().authenticated());
 
+        http.logout((logout) ->
+                logout
+                        .permitAll()
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/auth/login")
+        );
         return http.build();
     }
 
